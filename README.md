@@ -1,2 +1,2 @@
 # ArvoreBMais
-# Elizandra Fernandes, Felipe Manzoni e Nadny Dantas
+# Elizandra Fernandes, Felipe Sonntag Manzoni e Nadny Dantas
