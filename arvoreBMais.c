@@ -13,7 +13,7 @@ typedef struct paginaDaArvore{
   int chaves[D-1];
 
   //ponteiro para as paginas filhas
-  struct paginaFilha[D];   
+  struct *paginaDaArvore paginaFilha[D];   
 
 }paginaDaArvore;
 
