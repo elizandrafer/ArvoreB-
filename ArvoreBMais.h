@@ -3,12 +3,6 @@
 #define maxRegistro 4096
 #define maxNivel 10
 
-/*#define minOrdem 3
-#define maxOrdem 4
-#define maxRegistro 100
-#define maxNivel 10
-*/
-
 //0 - Folha
 //1 - Não Folha
 
@@ -18,6 +12,16 @@ typedef struct noDaArvore {
    struct paginaInterna *pai;
 
 }noDaArvore;
+
+typedef struct arvoreBMais {
+
+    int ordem;
+    int registros;
+    int nivel;
+    struct noDaArvore *raiz;
+    struct noDaArvore *cabeca[maxNivel];
+
+}arvoreBMais;
 
 typedef struct paginaInterna{
 
@@ -41,16 +45,6 @@ typedef struct paginaFolha{
     int dados[maxRegistro];
 
 }paginaFolha;
-
-typedef struct arvoreBMais {
-
-    int ordem;
-    int registros;
-    int nivel;
-    struct noDaArvore *raiz;
-    struct noDaArvore *cabeca[maxNivel];
-
-}arvoreBMais;
 
 typedef struct configuracaoArvore {
  
@@ -98,51 +92,30 @@ void apagarFolha(paginaFolha *no){
   free(no);
 }
 
-void apagarPagina(paginaInterna *no){
-  free(no);
+void apagarPagina(paginaInterna *no) {
+    free(no);
 }
 
-/*int buscaBinaria(int *v, int tam, int valor) {
-    int meio, inicio = -1, fim = tam;
-    
-    while(inicio + 1 < fim) {
-        meio = inicio + (fim - inicio)/2;  
-        if(valor > v[meio]) {
+static int buscaBinaria(int *v, int tamanho, int valor) {
+    int inicio = -1;
+    int fim = tamanho;
+    while (inicio + 1 < fim) {
+        int meio = inicio + (fim - inicio) / 2;
+        if (valor > v[meio]) {
             inicio = meio;
-        }
-        else if (valor < v[meio]) {
+        } else {
             fim = meio;
         }
     }
-    if (fim >= tam || v[fim] != valor) {
+    if (fim >= tamanho || v[fim] != valor) {
         return -fim - 1;
     } else {
         return fim;
     }
-}*/
-
-static int buscaBinaria(int *v, int tamanho, int valor)
-{
-        int low = -1;
-        int high = tamanho;
-        while (low + 1 < high) {
-                int mid = low + (high - low) / 2;
-                if (valor > v[mid]) {
-                        low = mid;
-                } else {
-                        high = mid;
-                }
-        }
-        if (high >= tamanho || v[high] != valor) {
-                return -high - 1;
-        } else {
-                return high;
-        }
 }
 
 
-int buscarNaArvore(int chave)
-{
+int buscarNaArvore(int chave) {
     int i;
     paginaInterna *naoFolha;
     paginaFolha *folha;
@@ -389,8 +362,7 @@ int inserirNaFolha(paginaFolha *folha, int chave, int dado)
     return 0;
 }
 
-int inserirNaArvore(int chave, int dado)
-{
+int inserirNaArvore(int chave, int dado) {
     int i;
     paginaInterna *naoFolha;
     paginaFolha *folha, *raiz;
@@ -567,8 +539,7 @@ void removerDaPagina(paginaInterna *no, int rem, int nivel) {
     no->filhos--;
 }
 
-
-int removerDaFolha(paginaFolha *folha, int chave){
+int removerDaFolha(paginaFolha *folha, int chave) {
     
     int i, j, k;
     paginaFolha *sibling;
@@ -597,9 +568,6 @@ int removerDaFolha(paginaFolha *folha, int chave){
                     paginaFolha *sibEsq = (paginaFolha *)pai->subPtr[i-1];
                     paginaFolha *sibDir = (paginaFolha *)pai->subPtr[i+1];
                    
-                    //sibling = sibEsq->registros >= sibDir->registros ? sibEsq : sibDir;
-                    //emprestar = sibEsq->registros >= sibDir->registros ? 0 : 1;
-
                     if(sibEsq->registros >= sibDir->registros){
                         sibling = sibEsq;
                         emprestar = 0;
