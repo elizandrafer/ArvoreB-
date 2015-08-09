@@ -6,25 +6,25 @@
 #include "ArvoreBMais.h" //Biblioteca com as estruturas e funcoes
 
 //CHAMADAS DE FUNCOES BASICAS
-int buscarElemento(arvoreBMais *arvore, int chave) {
-    int dado = buscarNaArvore(arvore, chave); 
+int buscarElemento(int chave) {
+    int dado = buscarNaArvore(chave); 
     if (dado) {
-        printf("Elemento encontrado!\n");
+        printf("Sucesso! Elemento encontrado!\n");
         return dado;
     } else {
-        printf("Elemento nao encontrado!\n");
+        printf("Ops! Elemento nao encontrado!\n");
         return -1;
     }
 }
 
-int inserirElemento(arvoreBMais *arvore, int chave, int dado) {
+int inserirElemento(int chave, int dado) {
     if (dado) {
-        return inserirNaArvore(arvore, chave, dado);
+        return inserirNaArvore(chave, dado);
     } 
 }
 
-int removerElemento(arvoreBMais *arvore, int chave) {
-      return removerDaArvore(arvore, chave);
+int removerElemento(int chave) {
+      return removerDaArvore(chave);
 }
 
 arvoreBMais *inicializarArvore(int nivel, int ordem, int registros) { 
@@ -43,11 +43,11 @@ arvoreBMais *inicializarArvore(int nivel, int ordem, int registros) {
     return arvore;
 }
 
-void destruirArvore(arvoreBMais *arvore) {
+void destruirArvore() {
         free(arvore);
 }
 
-void exibirArvore(arvoreBMais *arvore) {
+void exibirArvore() {
     int i, j;
 
     for (i = arvore->nivel - 1; i > 0; i--) {
@@ -86,15 +86,15 @@ void exibirArvore(arvoreBMais *arvore) {
 //FUNCIONAMENTO DO PROGRAMA
 
 //>>>>>INSERCAO 
-void InsereArquivoArvore(arvoreBMais *arvore, FILE* arquivo) {  
+void InsereArquivoArvore(FILE* arquivo) {  
   int dado;
   
   while(fscanf(arquivo, "%d", &dado) != EOF){        
-    inserirElemento(arvore, dado, dado);
+    inserirElemento(dado, dado);
   }
 }
 
-void InsereNaArvoreBMais(arvoreBMais *arvore, char* string) {
+void InsereNaArvoreBMais(char* string) {
   FILE* arquivo;
   
   arquivo = fopen(string,"r");
@@ -114,28 +114,28 @@ void InsereNaArvoreBMais(arvoreBMais *arvore, char* string) {
       exit(1);
   }
 
-  InsereArquivoArvore(arvore, arquivo);
-  printf("Pronto!\n");
+  InsereArquivoArvore(arquivo);
+  printf("Sucesso!\n");
 
   printf("\n>>> Arvore atual \n\n");
-  exibirArvore(arvore);
+  exibirArvore();
 
   fclose(arquivo);
 }
 
 //>>>>>REMOCAO
 
-void RemoveArquivoArvore(arvoreBMais *arvore, FILE* arquivo) {    
+void RemoveArquivoArvore(FILE* arquivo) {    
     int dado;
 
     while(fscanf(arquivo, "%d", &dado) != EOF){            
-        removerElemento(arvore, dado);    
+        removerElemento(dado);    
     }  
 
-    printf("Pronto!\n");
+    printf("Sucesso!\n");
 
     printf("\n>>> Arvore atual \n\n");
-    exibirArvore(arvore);
+    exibirArvore();
 
     fclose(arquivo);
 }
@@ -146,8 +146,8 @@ void RemoveArquivoArvore(arvoreBMais *arvore, FILE* arquivo) {
 //Exibe um de menu para o usuario
 int Menu() {
   int opcao;
-  printf("\n-------------> Arvore B+ <-------------\n\n");
-  printf("    ----->>>>> MENU <<<<<-----\n\n");
+  printf("\n---------------->< ARVORE B+ ><----------------\n\n");
+  printf("    ----------->>>>> MENU <<<<<-----------\n\n");
   printf("1 - Inserir na Arvore\n");
   printf("2 - Remover da Arvore\n");
   printf("3 - Busca na Arvore\n");
@@ -160,21 +160,21 @@ int Menu() {
 }
 
 //Exibe um menu para insercao na arvore
-void MenuParaInsercao(arvoreBMais* arvore){
+void MenuParaInsercao(){
   char string[30];
   
   printf("\n    ----------- Insercao -----------\n\n");
   printf("Digite o nome do arquivo ou local que contem\nos valores a serem inseridos na arvore:\n");
   scanf("%s", string);
   printf("\nInserindo...\n");
-  InsereNaArvoreBMais(arvore, string);
+  InsereNaArvoreBMais(string);
 
   fflush(stdin);
   getchar();
 }
  
 //Exibe um menu para remocao da arvore
-void MenuParaRemocao(arvoreBMais* arvore){
+void MenuParaRemocao(){
   FILE* arquivo;
   char string[30];
   
@@ -187,7 +187,7 @@ void MenuParaRemocao(arvoreBMais* arvore){
     printf("Erro ao abrir o arquivo %s! Encerrando Programa...\n", string);
     exit(1);
   }
-  RemoveArquivoArvore(arvore, arquivo);
+  RemoveArquivoArvore(arquivo);
   
   fflush(stdin);
   getchar();
@@ -195,23 +195,24 @@ void MenuParaRemocao(arvoreBMais* arvore){
 }
 
 //Exibe um menu para busca na arvore
-void MenuParaBusca(arvoreBMais *arvore){
+void MenuParaBusca(){
   int chave;
   
   printf("\n    ----------- Busca -----------\n\n");
   printf("Digite o valor que se deseja buscar: ");
-  scanf("%d*c", &chave);
+  scanf("%d", &chave);
   printf("\nBuscando...\n");
   
-  buscarElemento(arvore, chave);
+  buscarElemento(chave);
   
   fflush(stdin);
   getchar();
 }
 
-void MostrarArvore(arvoreBMais *arvore) {
- 
-  exibirArvore(arvore);
+void MostrarArvore() {
+  printf("\n>>> Arvore atual \n\n");
+  exibirArvore();
+  
   fflush(stdin);
   getchar();
 }
@@ -223,16 +224,16 @@ int main(){
     opcao = Menu();
     switch(opcao) {
       case 1:
-        MenuParaInsercao(&arvore);
+        MenuParaInsercao();
         break;
       case 2:
-        MenuParaRemocao(&arvore);
+        MenuParaRemocao();
         break;
       case 3:
-        MenuParaBusca(&arvore);
+        MenuParaBusca();
         break;
       case 4:
-        MostrarArvore(&arvore);
+        MostrarArvore();
         break;
       case 0:
         sair = 1;

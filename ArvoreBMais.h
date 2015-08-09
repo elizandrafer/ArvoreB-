@@ -92,9 +92,7 @@ paginaFolha* criarFolha(void) {
     return folha;
 }
 
-arvoreBMais arvore;
-int *vet_insercao;
-int *vet_remocao;
+arvoreBMais *arvore;
 
 void apagarFolha(paginaFolha *no){
   free(no);
@@ -104,7 +102,7 @@ void apagarPagina(paginaInterna *no){
   free(no);
 }
 
-int buscaBinaria(int *v, int tam, int valor) {
+/*int buscaBinaria(int *v, int tam, int valor) {
     int meio, inicio = -1, fim = tam;
     
     while(inicio + 1 < fim) {
@@ -121,9 +119,29 @@ int buscaBinaria(int *v, int tam, int valor) {
     } else {
         return fim;
     }
+}*/
+
+static int buscaBinaria(int *v, int tamanho, int valor)
+{
+        int low = -1;
+        int high = tamanho;
+        while (low + 1 < high) {
+                int mid = low + (high - low) / 2;
+                if (valor > v[mid]) {
+                        low = mid;
+                } else {
+                        high = mid;
+                }
+        }
+        if (high >= tamanho || v[high] != valor) {
+                return -high - 1;
+        } else {
+                return high;
+        }
 }
 
-int buscarNaArvore(arvoreBMais *arvore, int chave)
+
+int buscarNaArvore(int chave)
 {
     int i;
     paginaInterna *naoFolha;
@@ -158,7 +176,7 @@ int buscarNaArvore(arvoreBMais *arvore, int chave)
     return 0;
 }
 
-int inserirNaPagina(arvoreBMais *arvore, paginaInterna *pagina, noDaArvore *noArv, int chave, int nivel)
+int inserirNaPagina(paginaInterna *pagina, noDaArvore *noArv, int chave, int nivel)
 {
     int i, j;
     int split = 0, split_chave;
@@ -261,7 +279,7 @@ int inserirNaPagina(arvoreBMais *arvore, paginaInterna *pagina, noDaArvore *noAr
         paginaInterna *pai = pagina->pai;
         if (pai == NULL) {                        
             if (++nivel >= arvore->nivel) {
-                fprintf(stderr, "!!Panic: Nivel exceeded, please expand the arvore nivel, non-folha ordem or leaf registros for element capacity!\n");
+                printf("Nivel excedido!\n");
                 pagina->proximo = sibling->proximo;
                 apagarPagina(sibling);
                 return -1;
@@ -279,14 +297,14 @@ int inserirNaPagina(arvoreBMais *arvore, paginaInterna *pagina, noDaArvore *noAr
             sibling->pai = pai;
         } else {  
             sibling->pai = pai;
-            return inserirNaPagina(arvore, pai, (noDaArvore*)sibling, split_chave, nivel+1);
+            return inserirNaPagina(pai, (noDaArvore*)sibling, split_chave, nivel+1);
         }
     }
 
     return 0;
 }
 
-int inserirNaFolha(arvoreBMais *arvore, paginaFolha *folha, int chave, int dado)
+int inserirNaFolha(paginaFolha *folha, int chave, int dado)
 {
     int i, j;
     int split = 0;
@@ -364,14 +382,14 @@ int inserirNaFolha(arvoreBMais *arvore, paginaFolha *folha, int chave, int dado)
             sibling->pai = pai;
         } else {
             sibling->pai = pai;
-            return inserirNaPagina(arvore, pai, (noDaArvore*)sibling, sibling->chaves[0], 1);
+            return inserirNaPagina(pai, (noDaArvore*)sibling, sibling->chaves[0], 1);
         }
     }
 
     return 0;
 }
 
-int inserirNaArvore(arvoreBMais *arvore, int chave, int dado)
+int inserirNaArvore(int chave, int dado)
 {
     int i;
     paginaInterna *naoFolha;
@@ -382,7 +400,7 @@ int inserirNaArvore(arvoreBMais *arvore, int chave, int dado)
         switch (no->tipo) {
         case 0:
             folha = (paginaFolha*)no;
-            return inserirNaFolha(arvore, folha, chave, dado);  
+            return inserirNaFolha(folha, chave, dado);  
         case 1:
             naoFolha = (paginaInterna*)no;
             i = buscaBinaria(naoFolha->chaves, naoFolha->filhos - 1, chave);
@@ -408,7 +426,7 @@ int inserirNaArvore(arvoreBMais *arvore, int chave, int dado)
     return 0;
 }
 
-void removerDaPagina(arvoreBMais *arvore, paginaInterna *no, int rem, int nivel) {
+void removerDaPagina(paginaInterna *no, int rem, int nivel) {
     
     int i, j, k;
     paginaInterna *sibling;
@@ -483,7 +501,7 @@ void removerDaPagina(arvoreBMais *arvore, paginaInterna *no, int rem, int nivel)
                                 
                     sibling->proximo = no->proximo;
                     apagarPagina(no);
-                    removerDaPagina(arvore, pai, i, nivel + 1);
+                    removerDaPagina(pai, i, nivel + 1);
                 }
             } else {
                 while(rem < no->filhos-2) {
@@ -522,7 +540,7 @@ void removerDaPagina(arvoreBMais *arvore, paginaInterna *no, int rem, int nivel)
                             
                     no->proximo = sibling->proximo;
                     apagarPagina(sibling);
-                    removerDaPagina(arvore, pai, i, nivel+1);
+                    removerDaPagina(pai, i, nivel+1);
                   }
             }
             return;
@@ -550,7 +568,7 @@ void removerDaPagina(arvoreBMais *arvore, paginaInterna *no, int rem, int nivel)
 }
 
 
-int removerDaFolha(arvoreBMais *arvore, paginaFolha *folha, int chave){
+int removerDaFolha(paginaFolha *folha, int chave){
     
     int i, j, k;
     paginaFolha *sibling;
@@ -630,7 +648,7 @@ int removerDaFolha(arvoreBMais *arvore, paginaFolha *folha, int chave){
                     
                     sibling->proximo = folha->proximo;
                     apagarFolha(folha);
-                    removerDaPagina(arvore, pai, i, 1);
+                    removerDaPagina(pai, i, 1);
                 }
             } else {
                 while(rem < folha->registros-1){
@@ -661,7 +679,7 @@ int removerDaFolha(arvoreBMais *arvore, paginaFolha *folha, int chave){
                     
                     folha->proximo = sibling->proximo;
                     apagarFolha(sibling);
-                    removerDaPagina(arvore, pai, i, 1);
+                    removerDaPagina(pai, i, 1);
                 }
             }
             
@@ -687,7 +705,7 @@ int removerDaFolha(arvoreBMais *arvore, paginaFolha *folha, int chave){
     return 0;
 }
 
-static int removerDaArvore(arvoreBMais *arvore, int chave)
+static int removerDaArvore(int chave)
 {
     int i;
     paginaInterna *naoFolha;
@@ -698,7 +716,7 @@ static int removerDaArvore(arvoreBMais *arvore, int chave)
         switch (no->tipo) {
         case 0: //folha
             folha = (paginaFolha*)no;
-            return removerDaFolha(arvore, folha, chave);
+            return removerDaFolha(folha, chave);
 
         case 1: //nao-folha
             naoFolha = (paginaInterna*)no;
