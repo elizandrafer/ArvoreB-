@@ -1,3 +1,5 @@
+//Elizandra Fernandes, Felipe Manzoni e Nadny Dantas
+
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
