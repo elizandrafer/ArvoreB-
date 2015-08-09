@@ -286,6 +286,147 @@ int inserirNaArvore(){
   
 }
 
+void removeNaPagina(arvoreBMais *arvore, paginaInterna *no, int remove, int nivel){
+
+	int i, j, k;
+        paginaInterna *irmo;
+
+        if (no->filhos <= (arvore->nivel+1)/2) {
+		paginaInterna *pai = no->pai;
+	        if (pai != NULL) {
+                        int empresta = 0;
+	
+			// encontra qual o nó irmão com o mesmo pai a ser emprestado 
+			i = buscaBinaria(pai->chave, pai->filhos -1, no->chave[0]);
+			assert(i < 0);
+			i = -i - 1;
+			if(i == 0 ){
+				//não há irmão à esquerda, escolha um da direita.
+				irmao = (paginaInterna *)pai->subPtr[i+1];
+				empresta = emprestadoDaDireita;			
+			} else if(i == pai->filhos - 1){
+				//não há irmão à Direita, escolha um da esquerda.
+				irmão = (paginaInterna *)pais->subPtr[i-1];
+				empresta = emprestadoDaEsquerda;
+			} else {
+				paginaInterna *irmaoEsquerda = (paginaInterna *)pai->subPtr[i-1];
+				paginaINterna *irmaoDireita =  (paginaInterna *)pai->subPtr[i-1];
+				//se ambos irmao esquerda e direita forem encontrados, escolha um com mais filhos
+				irmao = irmaoEsquerda->filhos >= irmaoDireita ? irmaoEsquerda : irmaoDireita;
+				empresta = irmaoEsquerda->filhos >= irmaoDireita ? emprestaDaEsquerda : emprestaDaDireita;
+			}
+			//localiza o nó pai na chave indice
+			if(i > 0){
+				i = i-1;
+			}
+			if(empresta = emprestaDaEsquerda){
+				if(irmao->filhos > (arvore->ordem + 1) / 2){
+					// nó da direita deslocado
+					for(j = remove; j>0 ; j--){
+						no->chave[j] = no->chave[j-1];
+					}
+					for(j = remove+1; j>0; j--){
+						no->subPtr[j] = no->subPtr[j-1];
+					}
+					//rotaciona à direita chave
+					no->chave[0] = pai->chave[i];
+					pai->chave[i] = irmao->chave[irmao->chave-2];
+					//move a esquerda os irmaos do ultimo subno dentro da localizacao dos primeiros nos
+					no->subPtr[0] = irmao->subPtr[irmao->filhos - 1];
+					irmao->subPtr[irmao->filhos - 1]->pai  = no;
+					irmao->filhos--;
+				}else{
+					//move pai na chave de trás
+					irmao->chave[irmao->filhos - 1] = pai->chave[i];
+					//intercala no e irmao a esquerda
+					for(j = imrao->filhos, k = 0; k < no->filhos - 1; k++){
+						if(k != remove){
+							irmao->chave[j] = no->chave[k];
+							j++;
+						}
+					}
+					for(j = irmao->filhos, k = 0; k < no->filhos - 1; k++){
+						if(k !=  remove + 1){
+							irmao->subPtr[j] = no->subPtr[k];
+							no->subPtr[k]->pai = irmao;
+							j++; 
+						}
+					}
+					irmao->filhos = j;
+					//deleta intercalacao do no
+					irmao->proximo = no->proximo;
+					removePaginaInterna(no);
+					//sobe um nivel
+					removePaginaIntern(arvore, pai, i, nivel+1);
+				}
+			} else{
+				//remove chave no primeiro caso de overflow do merge com o no irmao
+				for(; remove < no->filhos - 2; remove++){
+					no->chave[remove] = no->chave[remove+1];
+					no->subPtr[remove+1] = no->subPtr[remove+2];
+				}
+				no->filhos--;
+				if(irmao->filhos > (arvore->ordem+1) / 2){
+					//rotaciona a esquerda na chave
+					no->chave[no->filhos-1] = pai->chave[i];
+					pai->chave[i] = irmao->chave[0];
+					no->filhos++;
+					//move a direita dos irmaos o primeiro subno dentro dos nós $$$ultimo localizacao
+					no->subPtr[no->filhos - 1] = irmao->subPtr[0];
+					irmao->subPtr[0]->pai = no;
+					//desloca irmao da direita a esquerda
+					for (j = 0; j < irmao->filhos - 2; j++) {
+                                                irmao->chave[j] = irmao->chave[j + 1];
+                                        }
+                                        for (j = 0; j < irmao->filhos - 1; j++) {
+                                                irmao->subPtr[j] = irmao->subPtr[j + 1];
+                                        }
+                                        irmao->filhos--;
+				}else{
+					//move pai na chave de tras
+					no->chave[no->filhos - 1] = pai->chave[i];
+					no->filhos++;
+					//intercala no e irmao a direita
+					for (j = no->filhos - 1, k = 0; k < irmao->filhos - 1; j++, k++) {
+                                                no->chave[j] = irmao->chave[k];
+                                        }
+                                        for (j = no->filhos - 1, k = 0; k < irmao->filhos; j++, k++) {
+                                                no->subPtr[j] = irmao->subPtr[k];
+                                                irmao->subPtr[k]->pai = no;
+                                        }
+					no->filhos = j;
+					//deleta o merge do irmao
+					no->proximo = irmao->proximo;
+					removePaginaInterna(irmao);
+					//sobe um nivel
+					removePaginaInterna(arvore, pai, i, nivel + 1);
+				}
+			}
+			//finaliza a remocao
+			return;
+		}else{
+			if(no->filhos == 2){
+			        //deleta o no raiz mais velho
+                                assert(remove == 0);
+                                no->subPtr[0]->pai = NULL;
+                                arvore->raiz = no->subPtr[0];
+                                arvore->cabeca[nivel] = NULL;
+                                removePaginaInterna(no);
+                                return;
+                        }
+		}
+	}
+
+	//unica remocao
+        assert(no->filhos > 2);
+        for (; remove < no->filhos - 2; remove++) {
+                no->chave[remove] = no->chave[remove + 1];
+                no->subPtr[remove + 1] = no->subPtr[remove + 2];
+        }
+        no->filhos--;
+                              
+}
+
 int main(){
 
 
