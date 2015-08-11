@@ -1,5 +1,3 @@
-//Elizandra Fernandes, Felipe Manzoni e Nadny Dantas
-
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -105,10 +103,22 @@ void InsereNaArvoreBMais(char* string) {
     exit(1);
   }
   
+  int nivel, ordem, registros; 
+  printf("Digite a quantidade de niveis: ");
+  scanf("%d", &nivel);
+
+  printf("Digite a ordem: ");
+  scanf("%d", &ordem);
+
+  printf("Digite a quantidade de registros: ");
+  scanf("%d", &registros);
+  printf("\n");
+
+  // 5, 7 ,10
   configuracaoArvore configuracao;
-  configuracao.nivel = 5;
-  configuracao.ordem = 7;
-  configuracao.registros = 10;
+  configuracao.nivel = nivel;
+  configuracao.ordem = ordem;
+  configuracao.registros = registros;
 
   arvore = inicializarArvore(configuracao.nivel, configuracao.ordem, configuracao.registros);
   if (arvore == NULL) {
