@@ -3,7 +3,10 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "ArvoreBMais.h" //Biblioteca com as estruturas e funcoes
+//Biblioteca com as estruturas e funcoes principais de insercao, busca e remocao em uma Árvore B+
+#include "ArvoreBMais.h" 
+
+int nivel = 5, ordem = 7, registros = 10; 
 
 //CHAMADAS DE FUNCOES BASICAS
 int buscarElemento(int chave) {
@@ -103,18 +106,6 @@ void InsereNaArvoreBMais(char* string) {
     exit(1);
   }
   
-  int nivel, ordem, registros; 
-  printf("Digite a quantidade de niveis: ");
-  scanf("%d", &nivel);
-
-  printf("Digite a ordem: ");
-  scanf("%d", &ordem);
-
-  printf("Digite a quantidade de registros: ");
-  scanf("%d", &registros);
-  printf("\n");
-
-  // 5, 7 ,10
   configuracaoArvore configuracao;
   configuracao.nivel = nivel;
   configuracao.ordem = ordem;
@@ -191,7 +182,7 @@ void MenuParaRemocao(){
   char string[30];
   
   printf("\n    ----------- Remocao -----------\n\n");
-  printf("Digite o nome do arquivo ou local que contem\nos valors a serem removidos da arvore:\n");
+  printf("Digite o nome do arquivo ou local que contem\nos valores a serem removidos da arvore:\n");
   scanf("%s", string);
   printf("\nRemovendo...\n");
   arquivo = fopen(string,"r");
